@@ -70,6 +70,29 @@ const collabField = StateField.define({
     if (effects.length || !tr.changes.empty)
       return new CollabState(collab.version, collab.unconfirmed.concat(new LocalUpdate(tr, tr.changes, effects, clientID)))
     return collab
+  },
+
+  toJSON(collab: CollabState) {
+    return {
+      version: collab.version,
+      unconfirmed: collab.unconfirmed.map(update => ({
+        changes: update.changes.toJSON(),
+        clientID: update.clientID,
+        effects: [], // TODO
+      }))
+    }
+  },
+
+  fromJSON(json: any) {
+    return new CollabState(
+      json.version,
+      json.unconfirmed.map(update => new LocalUpdate(
+        undefined,
+        ChangeSet.fromJSON(update.changes),
+        update.effects,
+        update.clientID)
+      )
+    );
   }
 })
 
@@ -147,4 +170,8 @@ export function getSyncedVersion(state: EditorState) {
 /// Get this editor's collaborative editing client ID.
 export function getClientID(state: EditorState) {
   return state.facet(collabConfig).clientID
+}
+
+export function getCollabField() {
+  return collabField;
 }
