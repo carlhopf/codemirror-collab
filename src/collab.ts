@@ -111,7 +111,7 @@ export function receiveUpdates(state: EditorState, updates: readonly Update[]) {
   version += updates.length
 
   let own = 0
-  while (own < updates.length && updates[own].clientID == clientID) own++
+  while (own < updates.length && unconfirmed[own] && updates[own].clientID == unconfirmed[own].clientID) own++
   if (own) {
     unconfirmed = unconfirmed.slice(own)
     updates = updates.slice(own)
